@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>闇の影響関係図（タップ対応・dokudenpa増殖v2）</title>
+<title>闇の影響関係図（多層増殖 v3）</title>
 <style>
   :root{
     --bg:#0b0c10;
     --panel:#13141a;
     --ink:#e9e9ee;
     --muted:#b9b9c5;
-    --accent:#8a7cff;
+    --accent:#8a7cff;   /* 妖しい紫（上層ミクロ群） */
     --evil:#ff4d7a;
-    --faction:#cfe6ff;
+    --faction:#cfe6ff;  /* dokudenpa 群 */
   }
   @font-face{
     font-family: "Noto Sans JP";
@@ -97,7 +97,7 @@
     z-index: 10;
   }
 
-  /* swarm: 四角ノード + 有機的な増殖 */
+  /* dokudenpa 群（青系・四角） */
   .swarm .slink{
     stroke: rgba(160,200,255,.32);
     stroke-width: 1.1;
@@ -111,6 +111,21 @@
     rx: 3; ry: 3;
     filter: drop-shadow(0 0 10px rgba(160,210,255,.45));
   }
+
+  /* 上層ミクロ群（紫系・四角） */
+  .micros .mlink{
+    stroke: rgba(180,150,255,.28);
+    stroke-width: 1;
+    fill:none;
+    marker-end:url(#arrowMini);
+  }
+  .micros .micro{
+    fill: #b69cff;
+    stroke: rgba(200,170,255,.75);
+    stroke-width: .55;
+    rx: 2.6; ry: 2.6;
+    filter: drop-shadow(0 0 9px rgba(180,150,255,.45));
+  }
 </style>
 </head>
 <body>
@@ -119,13 +134,13 @@
 
 <header>
   <h1>闇の影響関係図</h1>
-  <p class="desc">タップで注釈表示。dokudenpa は四角ノードで“増殖”し、徐々に広がる。</p>
+  <p class="desc">タップで注釈表示。dokudenpa は青い群勢、その他の上層も紫の微小ノードを少量“繁殖”。</p>
 </header>
 
 <main class="stage">
-  <svg viewBox="0 0 1200 900" aria-labelledby="title desc" role="img">
-    <title id="title">闇の影響関係図（dokudenpa増殖v2）</title>
-    <desc id="desc">トミさん起点の闇と、別勢力 dokudenpa の時間的な増殖を示す図。</desc>
+  <svg viewBox="0 0 1200 960" aria-labelledby="title desc" role="img">
+    <title id="title">闇の影響関係図（多層増殖 v3）</title>
+    <desc id="desc">トミさん起点の闇と、別勢力 dokudenpa の増殖に加え、上層ほど多い紫のミクロ群を可視化。</desc>
 
     <defs>
       <marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
@@ -137,42 +152,42 @@
     </defs>
 
     <!-- 主要ノード -->
-    <g class="node root tappable" data-tip="すべての闇の根源" transform="translate(480,40)">
+    <g id="tomi" class="node root tappable" data-tip="すべての闇の根源" transform="translate(480,40)">
       <rect width="240" height="72"></rect>
       <text x="120" y="36" text-anchor="middle" dominant-baseline="middle">トミさん</text>
     </g>
 
-    <g class="node tappable" data-tip="二番手／拡散者。一説では師を超える" transform="translate(480,170)">
+    <g id="knsk" class="node tappable" data-tip="二番手／拡散者。一説では師を超える" transform="translate(480,170)">
       <rect width="240" height="72"></rect>
       <text x="120" y="34" text-anchor="middle">knsk</text>
       <text class="sub" x="120" y="54" text-anchor="middle">拡散・媒介</text>
     </g>
 
-    <g class="node evil tappable" data-tip="影の実力者。装いの下に桁違いの邪悪" transform="translate(780,320)">
+    <g id="huyu" class="node evil tappable" data-tip="影の実力者。装いの下に桁違いの邪悪" transform="translate(780,320)">
       <rect width="240" height="72"></rect>
       <text x="120" y="34" text-anchor="middle">huyu</text>
       <text class="sub" x="120" y="54" text-anchor="middle">??? / 真の黒幕説</text>
     </g>
 
-    <g class="node small tappable" data-tip="元はまとも→悪影響で没入" transform="translate(180,320)">
+    <g id="capting" class="node small tappable" data-tip="元はまとも→悪影響で没入" transform="translate(180,320)">
       <rect width="240" height="72"></rect>
       <text x="120" y="34" text-anchor="middle">capting</text>
       <text class="sub" x="120" y="54" text-anchor="middle">闇にのめり込む</text>
     </g>
 
-    <g class="node small tappable" data-tip="かつてまとも→従順な配下へ" transform="translate(480,470)">
+    <g id="hase" class="node small tappable" data-tip="かつてまとも→従順な配下へ" transform="translate(480,470)">
       <rect width="240" height="72"></rect>
       <text x="120" y="34" text-anchor="middle">hase</text>
       <text class="sub" x="120" y="54" text-anchor="middle">従順な配下</text>
     </g>
 
-    <g class="node small tappable" data-tip="光の存在。闇の中で抵抗を続ける" transform="translate(820,470)">
+    <g id="anrak" class="node small tappable" data-tip="光の存在。闇の中で抵抗を続ける" transform="translate(820,470)">
       <rect width="200" height="72"></rect>
-      <text x="100" y="34" text-anchor="middle">anle</text>
+      <text x="100" y="34" text-anchor="middle">anrak</text>
       <text class="sub" x="100" y="54" text-anchor="middle">抵抗する光</text>
     </g>
 
-    <g id="dokudenpa" class="node faction tappable" data-tip="特大勢力。SNS 内に多数の軍勢" transform="translate(380,690)">
+    <g id="dokudenpa" class="node faction tappable" data-tip="特大勢力。SNS 内に多数の軍勢" transform="translate(380,730)">
       <rect width="440" height="80"></rect>
       <text x="220" y="40" text-anchor="middle">dokudenpa（別勢力）</text>
     </g>
@@ -189,8 +204,9 @@
     <text class="label" x="608" y="420">従属</text>
     <text class="label" x="888" y="420">抵抗</text>
 
-    <!-- swarm container -->
+    <!-- swarm containers -->
     <g id="swarm" class="swarm"></g>
+    <g id="micros" class="micros"></g>
 
   </svg>
 </main>
@@ -219,122 +235,152 @@
     tip.style.opacity = 1;
     tipVisible = true;
   }
-  function hideTip(){
-    tip.style.opacity = 0;
-    tipVisible = false;
+  function hideTip(){ tip.style.opacity = 0; tipVisible = false; }
+
+  // ==== 位置取得（<g transform="translate(x,y)"> とサイズから中心を出す）
+  function center(el, w, h){
+    const tr = el.getAttribute('transform') || '';
+    const m = tr.match(/translate\(([^,]+),\s*([^)]+)\)/);
+    const tx = m ? parseFloat(m[1]) : 0;
+    const ty = m ? parseFloat(m[2]) : 0;
+    return { x: tx + w/2, y: ty + h/2 };
   }
 
-  // ===== dokudenpa 増殖（四角ノード & 有機的ランダムウォーク） =====
-  const swarm = document.getElementById('swarm');
-  const base = document.getElementById('dokudenpa');
-  const baseX = 380 + 220;   // dokudenpa 中央X
-  const baseY = 690 + 40;    // 中央Y
+  // ===== dokudenpa 増殖（青・四角） =====
+  const swarmLayer = document.getElementById('swarm');
+  const baseEl = document.getElementById('dokudenpa');
+  const baseC = center(baseEl, 440, 80);
 
-  // 疑似乱数（決定論的）
-  let seed = 9001;
-  function rand(){ seed = (seed * 1664525 + 1013904223) % 0x100000000; return seed / 0x100000000; }
-  function randRange(a,b){ return a + rand()*(b-a); }
+  let seed = 42;
+  function rand(){ seed = (seed * 1664525 + 1013904223) % 0x100000000; return seed/0x100000000; }
+  function rr(a,b){ return a + rand()*(b-a); }
 
-  // ノードモデル
-  const nodes = [];
-  const links = [];
-  const MAX_NODES = 120;
-  const SPAWN_INTERVAL = 450; // ms
-  const CHILD_PROB = 0.25;    // 各ティックで子を産む確率
-  const SPEED = 0.25;         // ドリフト速度の基準
+  const dNodes = [];
+  const MAX_D = 120;
+  const SPAWN_D = 450;
 
-  // ベース親
-  const root = createMiniNode(baseX, baseY, null, 12);
-  nodes.push(root);
-
-  function createMiniNode(x,y,parent,size){
+  function makeDNode(x,y,parent,size){
     const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    rect.setAttribute('class','mininode');
-    rect.setAttribute('x', x - size/2);
-    rect.setAttribute('y', y - size/2);
-    rect.setAttribute('width', size);
-    rect.setAttribute('height', size);
-    rect.setAttribute('rx', 3);
-    rect.setAttribute('ry', 3);
-    g.appendChild(rect);
-    swarm.appendChild(g);
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('class','mininode');
+    r.setAttribute('x', x-size/2); r.setAttribute('y', y-size/2);
+    r.setAttribute('width', size);  r.setAttribute('height', size);
+    r.setAttribute('rx', 3); r.setAttribute('ry', 3);
+    g.appendChild(r);
+    swarmLayer.appendChild(g);
 
-    // link
-    let path = null;
+    let path=null;
     if(parent){
       path = document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('class','slink');
-      swarm.insertBefore(path, g); // 線を下に
+      swarmLayer.insertBefore(path, g);
     }
-
-    return {
-      g, rect, path,
-      x, y, size,
-      vx: randRange(-SPEED,SPEED),
-      vy: randRange(-SPEED,SPEED),
-      jitter: randRange(0.5,1.6),
-      parent
-    };
+    return {g, r, path, x, y, size,
+            vx: rr(-.25,.25), vy: rr(-.25,.25),
+            jitter: rr(.5,1.6), parent};
   }
 
-  // 定期スポーン（親からやや外縁に生まれ、少しずつ外へ）
-  const spawner = setInterval(()=>{
-    if(nodes.length >= MAX_NODES){ clearInterval(spawner); return; }
+  const root = makeDNode(baseC.x, baseC.y, null, 12);
+  dNodes.push(root);
 
-    // 親をランダムに選び、そこから外側へ少しオフセット
-    const p = nodes[Math.floor(rand()*nodes.length)];
-    const angle = randRange(0, Math.PI*2);
-    const r = randRange(30, 90);
-    const nx = p.x + Math.cos(angle) * r;
-    const ny = p.y + Math.sin(angle) * (r*0.65);
+  const spD = setInterval(()=>{
+    if(dNodes.length>=MAX_D){ clearInterval(spD); return; }
+    const p = dNodes[Math.floor(rand()*dNodes.length)];
+    const ang = rr(0, Math.PI*2), rad = rr(30, 90);
+    const nx = p.x + Math.cos(ang)*rad;
+    const ny = p.y + Math.sin(ang)*(rad*0.65);
+    const child = makeDNode(nx, ny, p, rr(6,11));
+    child.vx += (nx-baseC.x)*0.0008 + rr(-0.12,0.12);
+    child.vy += (ny-baseC.y)*0.0006 + rr(-0.12,0.12);
+    dNodes.push(child);
+  }, SPAWN_D);
 
-    const child = createMiniNode(nx, ny, p, randRange(6,11));
-    // 親方向から外へ流れるような初速
-    child.vx += (nx - baseX) * 0.0008 + randRange(-0.12,0.12);
-    child.vy += (ny - baseY) * 0.0006 + randRange(-0.12,0.12);
+  // ===== 上層ミクロ群（紫・四角） =====
+  const microLayer = document.getElementById('micros');
+  function makeMicro(x,y,parent,size){
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('class','micro');
+    r.setAttribute('x', x-size/2); r.setAttribute('y', y-size/2);
+    r.setAttribute('width', size);  r.setAttribute('height', size);
+    r.setAttribute('rx', 2.6); r.setAttribute('ry', 2.6);
+    g.appendChild(r);
+    microLayer.appendChild(g);
 
-    nodes.push(child);
-  }, SPAWN_INTERVAL);
+    let path=null;
+    if(parent){
+      path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('class','mlink');
+      microLayer.insertBefore(path, g);
+    }
+    return {g, r, path, x, y, size,
+            vx: rr(-.22,.22), vy: rr(-.22,.22),
+            jitter: rr(.4,1.2), parent};
+  }
 
-  // アニメーション：ランダムウォーク + わずかな外向き圧
+  // アンカー（上層ほど spawn 多）
+  const anchors = [
+    { id:'tomi',   w:240, h:72, weight: 1.0, max: 80,  interval: 900 },
+    { id:'knsk',   w:240, h:72, weight: 0.6, max: 48,  interval: 1100 },
+    { id:'huyu',   w:240, h:72, weight: 0.35, max: 28, interval: 1300 },
+    { id:'capting',w:240, h:72, weight: 0.20, max: 18, interval: 1500 },
+    { id:'hase',   w:240, h:72, weight: 0.18, max: 16, interval: 1600 },
+    { id:'anrak',  w:200, h:72, weight: 0.14, max: 14, interval: 1700 }
+  ].map(a=>{
+    const el = document.getElementById(a.id);
+    const c  = center(el, a.w, a.h);
+    a.cx = c.x; a.cy = c.y; a.nodes=[];
+    return a;
+  });
+
+  anchors.forEach(a=>{
+    a.nodes.push(makeMicro(a.cx, a.cy, null, rr(5,9)));
+    const timer = setInterval(()=>{
+      if(a.nodes.length>=a.max){ clearInterval(timer); return; }
+      if(rand() > a.weight) return;
+      const p = a.nodes[Math.floor(rand()*a.nodes.length)];
+      const ang = rr(0, Math.PI*2), rad = rr(18, 70);
+      const nx  = p.x + Math.cos(ang)*rad;
+      const ny  = p.y + Math.sin(ang)*(rad*0.6);
+      const child = makeMicro(nx, ny, p, rr(4.5,8.5));
+      child.vx += (nx - a.cx)*0.0007 + rr(-0.08,0.08);
+      child.vy += (ny - a.cy)*0.0006 + rr(-0.08,0.08);
+      a.nodes.push(child);
+    }, a.interval);
+  });
+
+  // アニメーション（両群ともランダムウォーク）
   let last = performance.now();
-  function tick(t){
-    const dt = Math.max(0.016, Math.min(0.05, (t - last)/1000)); // 秒
+  function step(t){
+    const dt = Math.max(0.016, Math.min(0.05, (t - last)/1000));
     last = t;
-
-    for(const n of nodes){
-      // 速度に微小ノイズ
-      n.vx += (rand()-0.5) * 0.03 * n.jitter;
-      n.vy += (rand()-0.5) * 0.03 * n.jitter;
-
-      // dokudenpa中心からの緩い外圧
-      const dx = n.x - baseX, dy = n.y - baseY;
-      n.vx += dx * 0.00005; n.vy += dy * 0.00005;
-
-      // 減衰
-      n.vx *= 0.98; n.vy *= 0.98;
-
-      // 位置更新
-      n.x += n.vx * (dt*60); // フレームレート補正
-      n.y += n.vy * (dt*60);
-
-      // 表示更新
-      n.rect.setAttribute('x', n.x - n.size/2);
-      n.rect.setAttribute('y', n.y - n.size/2);
-
-      if(n.path){
-        const px = n.parent ? n.parent.x : baseX;
-        const py = n.parent ? n.parent.y : baseY;
-        const cx = (px + n.x)/2 + (randRange(-20,20));
-        const cy = (py + n.y)/2 + (randRange(-10,10));
-        n.path.setAttribute('d', `M ${px},${py} Q ${cx},${cy} ${n.x},${n.y}`);
+    function advance(list, origin){
+      for(const n of list){
+        n.vx += (rand()-0.5) * 0.03 * n.jitter;
+        n.vy += (rand()-0.5) * 0.03 * n.jitter;
+        if(origin){
+          n.vx += (n.x - origin.x) * 0.00005;
+          n.vy += (n.y - origin.y) * 0.00005;
+        }
+        n.vx *= 0.985; n.vy *= 0.985;
+        n.x += n.vx * (dt*60);
+        n.y += n.vy * (dt*60);
+        n.r.setAttribute('x', n.x - n.size/2);
+        n.r.setAttribute('y', n.y - n.size/2);
+        if(n.path){
+          const px = n.parent ? n.parent.x : (origin? origin.x : n.x);
+          const py = n.parent ? n.parent.y : (origin? origin.y : n.y);
+          const cx = (px + n.x)/2 + rr(-18,18);
+          const cy = (py + n.y)/2 + rr(-10,10);
+          n.path.setAttribute('d', `M ${px},${py} Q ${cx},${cy} ${n.x},${n.y}`);
+        }
       }
     }
-
-    requestAnimationFrame(tick);
+    advance(dNodes, baseC);
+    anchors.forEach(a=> advance(a.nodes, {x:a.cx, y:a.cy}));
+    requestAnimationFrame(step);
   }
-  requestAnimationFrame(tick);
+  requestAnimationFrame(step);
 
 })();
 </script>
