@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>闇の影響関係図（タップ対応・dokudenpa増殖v2）</title>
+<style>
+  :root{
+    --bg:#0b0c10;
+    --panel:#13141a;
+    --ink:#e9e9ee;
+    --muted:#b9b9c5;
+    --accent:#8a7cff;
+    --evil:#ff4d7a;
+    --faction:#cfe6ff;
+  }
+  @font-face{
+    font-family: "Noto Sans JP";
+    src: local("Noto Sans JP"), local("Yu Gothic Medium");
+    font-display: swap;
+  }
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(120% 100% at 50% 0%, #10111a 0%, #0a0b10 60%, #06070c 100%);
+    color: var(--ink);
+    font-family: "Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN",
+      "Yu Gothic", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    letter-spacing:.03em;
+  }
+  .fx-vignette::before{
+    content:""; position:fixed; inset:-10vmin; pointer-events:none; z-index:2;
+    background:radial-gradient(120% 140% at 50% 50%, transparent 55%, rgba(0,0,0,.45) 80%, rgba(0,0,0,.78) 100%);
+    mix-blend-mode:multiply;
+  }
+  .fx-noise::after{
+    content:""; position:fixed; inset:-10vmin; z-index:3; pointer-events:none;
+    opacity:.08;
+    background-image:url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" width=\"200\" height=\"200\" viewBox=\"0 0 200 200\">\
+<filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"2\" stitchTiles=\"stitch\"/></filter>\
+<rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\"/></svg>');
+    animation: grain 1.5s steps(2) infinite;
+    mix-blend-mode:soft-light;
+  }
+  @keyframes grain { from{ transform:translate(0,0) } to{ transform:translate(1%, -1%) } }
+  .fog, .fog::before, .fog::after{
+    position: fixed; inset:-20vmin; content:""; pointer-events:none; z-index:1;
+    background: radial-gradient(40vmin 30vmin at 20% 20%, rgba(112,105,170,.07), transparent 60%),
+                radial-gradient(50vmin 35vmin at 80% 30%, rgba(255,80,150,.05), transparent 60%),
+                radial-gradient(45vmin 30vmin at 60% 80%, rgba(90,200,255,.05), transparent 60%);
+    filter: blur(30px);
+    animation: drift 18s linear infinite;
+  }
+  .fog::before{ animation-duration: 26s; animation-direction: reverse; opacity:.7; }
+  .fog::after{ animation-duration: 34s; opacity:.5; }
+  @keyframes drift {
+    from { transform: translate3d(-3%, -2%, 0) }
+    50%  { transform: translate3d( 3%,  2%, 0) }
+    to   { transform: translate3d(-3%, -2%, 0) }
+  }
+  header{ text-align:center; padding:1.2rem .8rem 0; z-index:4; position:relative; }
+  h1{ margin:.2rem auto 0; font-weight:700; font-size: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+      letter-spacing:.08em; text-shadow: 0 0 .35rem rgba(255,255,255,.12), 0 0 1.2rem rgba(90,80,200,.35);}
+  p.desc{ margin:.4rem auto 1.2rem; color:var(--muted); font-size:.92rem; }
+  .stage{ position:relative; z-index:4; max-width:1200px; margin:0 auto; padding: 1rem 1rem 2rem; }
+
+  .node rect{
+    fill: var(--panel); stroke: rgba(180,180,240,.35); stroke-width: 1.2; rx: 10; ry: 10;
+    filter: drop-shadow(0 2px 10px rgba(0,0,0,.45));
+  }
+  .node text{ font-size: 16px; fill: var(--ink); }
+  .node.small text{ font-size: 14px; }
+  .node .sub { fill: var(--muted); font-size: 12px; }
+  .root rect{ stroke: var(--accent); }
+  .root text{ font-weight: 800; letter-spacing:.06em }
+  .evil rect{ stroke: rgba(255,77,122,.65); }
+  .evil text{ fill: #ffd0dc; }
+  .faction rect{ stroke: rgba(180,220,255,.55); }
+
+  .link{ stroke: rgba(200,200,230,.42); stroke-width: 2; fill: none; marker-end: url(#arrow);
+         filter: drop-shadow(0 0 .25rem rgba(0,0,0,.6)); }
+  .link.evil{ stroke: rgba(255,77,122,.7) }
+  .label{ fill: var(--muted); font-size: 12px; }
+
+  svg{ width:100%; height:auto }
+
+  .tip {
+    position: fixed; left:0; top:0;
+    transform: translate(-50%, -120%);
+    background: rgba(16,16,22,.98);
+    border: 1px solid rgba(138,124,255,.35);
+    border-radius: .6rem;
+    padding:.45rem .65rem; white-space: nowrap;
+    font-size:.95rem; color:var(--ink);
+    pointer-events:none; opacity:0; transition:.12s ease;
+    box-shadow: 0 16px 32px rgba(0,0,0,.55);
+    z-index: 10;
+  }
+
+  /* swarm: 四角ノード + 有機的な増殖 */
+  .swarm .slink{
+    stroke: rgba(160,200,255,.32);
+    stroke-width: 1.1;
+    fill:none;
+    marker-end:url(#arrowMini);
+  }
+  .swarm .mininode{
+    fill: var(--faction);
+    stroke: rgba(120,170,230,.75);
+    stroke-width: .6;
+    rx: 3; ry: 3;
+    filter: drop-shadow(0 0 10px rgba(160,210,255,.45));
+  }
+</style>
+</head>
+<body>
+<div class="fx-vignette fx-noise"></div>
+<div class="fog"></div>
+
+<header>
+  <h1>闇の影響関係図</h1>
+  <p class="desc">タップで注釈表示。dokudenpa は四角ノードで“増殖”し、徐々に広がる。</p>
+</header>
+
+<main class="stage">
+  <svg viewBox="0 0 1200 900" aria-labelledby="title desc" role="img">
+    <title id="title">闇の影響関係図（dokudenpa増殖v2）</title>
+    <desc id="desc">トミさん起点の闇と、別勢力 dokudenpa の時間的な増殖を示す図。</desc>
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+        <path d="M0,0 L10,4 L0,8 Z" fill="rgba(220,220,255,.8)"></path>
+      </marker>
+      <marker id="arrowMini" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="rgba(210,230,255,.75)"></path>
+      </marker>
+    </defs>
+
+    <!-- 主要ノード -->
+    <g class="node root tappable" data-tip="すべての闇の根源" transform="translate(480,40)">
+      <rect width="240" height="72"></rect>
+      <text x="120" y="36" text-anchor="middle" dominant-baseline="middle">トミさん</text>
+    </g>
+
+    <g class="node tappable" data-tip="二番手／拡散者。一説では師を超える" transform="translate(480,170)">
+      <rect width="240" height="72"></rect>
+      <text x="120" y="34" text-anchor="middle">knsk</text>
+      <text class="sub" x="120" y="54" text-anchor="middle">拡散・媒介</text>
+    </g>
+
+    <g class="node evil tappable" data-tip="影の実力者。装いの下に桁違いの邪悪" transform="translate(780,320)">
+      <rect width="240" height="72"></rect>
+      <text x="120" y="34" text-anchor="middle">huyu</text>
+      <text class="sub" x="120" y="54" text-anchor="middle">??? / 真の黒幕説</text>
+    </g>
+
+    <g class="node small tappable" data-tip="元はまとも→悪影響で没入" transform="translate(180,320)">
+      <rect width="240" height="72"></rect>
+      <text x="120" y="34" text-anchor="middle">capting</text>
+      <text class="sub" x="120" y="54" text-anchor="middle">闇にのめり込む</text>
+    </g>
+
+    <g class="node small tappable" data-tip="かつてまとも→従順な配下へ" transform="translate(480,470)">
+      <rect width="240" height="72"></rect>
+      <text x="120" y="34" text-anchor="middle">hase</text>
+      <text class="sub" x="120" y="54" text-anchor="middle">従順な配下</text>
+    </g>
+
+    <g class="node small tappable" data-tip="光の存在。闇の中で抵抗を続ける" transform="translate(820,470)">
+      <rect width="200" height="72"></rect>
+      <text x="100" y="34" text-anchor="middle">anle</text>
+      <text class="sub" x="100" y="54" text-anchor="middle">抵抗する光</text>
+    </g>
+
+    <g id="dokudenpa" class="node faction tappable" data-tip="特大勢力。SNS 内に多数の軍勢" transform="translate(380,690)">
+      <rect width="440" height="80"></rect>
+      <text x="220" y="40" text-anchor="middle">dokudenpa（別勢力）</text>
+    </g>
+
+    <!-- 主要リンク -->
+    <path class="link evil" d="M600,112 C600,132 600,148 600,170" />
+    <path class="link" d="M520,242 C430,290 340,300 300,320" />
+    <path class="link evil" d="M680,242 C780,280 870,290 900,320" />
+    <path class="link" d="M600,242 C600,340 600,380 600,470" />
+    <path class="link" d="M640,242 C720,340 840,380 920,470" />
+    <text class="label" x="612" y="150">邪悪なエネルギー</text>
+    <text class="label" x="352" y="302">悪影響</text>
+    <text class="label" x="742" y="300">装いの下で拡大</text>
+    <text class="label" x="608" y="420">従属</text>
+    <text class="label" x="888" y="420">抵抗</text>
+
+    <!-- swarm container -->
+    <g id="swarm" class="swarm"></g>
+
+  </svg>
+</main>
+
+<div id="tooltip" class="tip" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const svg = document.querySelector('svg');
+  const tip = document.getElementById('tooltip');
+  let tipVisible = false;
+
+  // タップで表示/非表示
+  svg.addEventListener('pointerdown', (e)=>{
+    const node = e.target.closest('.tappable');
+    if(node){
+      showTip(node, e.clientX, e.clientY);
+    } else if(tipVisible){
+      hideTip();
+    }
+  });
+  function showTip(el, x, y){
+    tip.textContent = el.getAttribute('data-tip') || '';
+    tip.style.left = x + 'px';
+    tip.style.top  = (y - 16) + 'px';
+    tip.style.opacity = 1;
+    tipVisible = true;
+  }
+  function hideTip(){
+    tip.style.opacity = 0;
+    tipVisible = false;
+  }
+
+  // ===== dokudenpa 増殖（四角ノード & 有機的ランダムウォーク） =====
+  const swarm = document.getElementById('swarm');
+  const base = document.getElementById('dokudenpa');
+  const baseX = 380 + 220;   // dokudenpa 中央X
+  const baseY = 690 + 40;    // 中央Y
+
+  // 疑似乱数（決定論的）
+  let seed = 9001;
+  function rand(){ seed = (seed * 1664525 + 1013904223) % 0x100000000; return seed / 0x100000000; }
+  function randRange(a,b){ return a + rand()*(b-a); }
+
+  // ノードモデル
+  const nodes = [];
+  const links = [];
+  const MAX_NODES = 120;
+  const SPAWN_INTERVAL = 450; // ms
+  const CHILD_PROB = 0.25;    // 各ティックで子を産む確率
+  const SPEED = 0.25;         // ドリフト速度の基準
+
+  // ベース親
+  const root = createMiniNode(baseX, baseY, null, 12);
+  nodes.push(root);
+
+  function createMiniNode(x,y,parent,size){
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('class','mininode');
+    rect.setAttribute('x', x - size/2);
+    rect.setAttribute('y', y - size/2);
+    rect.setAttribute('width', size);
+    rect.setAttribute('height', size);
+    rect.setAttribute('rx', 3);
+    rect.setAttribute('ry', 3);
+    g.appendChild(rect);
+    swarm.appendChild(g);
+
+    // link
+    let path = null;
+    if(parent){
+      path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('class','slink');
+      swarm.insertBefore(path, g); // 線を下に
+    }
+
+    return {
+      g, rect, path,
+      x, y, size,
+      vx: randRange(-SPEED,SPEED),
+      vy: randRange(-SPEED,SPEED),
+      jitter: randRange(0.5,1.6),
+      parent
+    };
+  }
+
+  // 定期スポーン（親からやや外縁に生まれ、少しずつ外へ）
+  const spawner = setInterval(()=>{
+    if(nodes.length >= MAX_NODES){ clearInterval(spawner); return; }
+
+    // 親をランダムに選び、そこから外側へ少しオフセット
+    const p = nodes[Math.floor(rand()*nodes.length)];
+    const angle = randRange(0, Math.PI*2);
+    const r = randRange(30, 90);
+    const nx = p.x + Math.cos(angle) * r;
+    const ny = p.y + Math.sin(angle) * (r*0.65);
+
+    const child = createMiniNode(nx, ny, p, randRange(6,11));
+    // 親方向から外へ流れるような初速
+    child.vx += (nx - baseX) * 0.0008 + randRange(-0.12,0.12);
+    child.vy += (ny - baseY) * 0.0006 + randRange(-0.12,0.12);
+
+    nodes.push(child);
+  }, SPAWN_INTERVAL);
+
+  // アニメーション：ランダムウォーク + わずかな外向き圧
+  let last = performance.now();
+  function tick(t){
+    const dt = Math.max(0.016, Math.min(0.05, (t - last)/1000)); // 秒
+    last = t;
+
+    for(const n of nodes){
+      // 速度に微小ノイズ
+      n.vx += (rand()-0.5) * 0.03 * n.jitter;
+      n.vy += (rand()-0.5) * 0.03 * n.jitter;
+
+      // dokudenpa中心からの緩い外圧
+      const dx = n.x - baseX, dy = n.y - baseY;
+      n.vx += dx * 0.00005; n.vy += dy * 0.00005;
+
+      // 減衰
+      n.vx *= 0.98; n.vy *= 0.98;
+
+      // 位置更新
+      n.x += n.vx * (dt*60); // フレームレート補正
+      n.y += n.vy * (dt*60);
+
+      // 表示更新
+      n.rect.setAttribute('x', n.x - n.size/2);
+      n.rect.setAttribute('y', n.y - n.size/2);
+
+      if(n.path){
+        const px = n.parent ? n.parent.x : baseX;
+        const py = n.parent ? n.parent.y : baseY;
+        const cx = (px + n.x)/2 + (randRange(-20,20));
+        const cy = (py + n.y)/2 + (randRange(-10,10));
+        n.path.setAttribute('d', `M ${px},${py} Q ${cx},${cy} ${n.x},${n.y}`);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+})();
+</script>
+</body>
+</html>
